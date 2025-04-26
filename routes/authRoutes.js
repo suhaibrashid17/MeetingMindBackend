@@ -4,7 +4,6 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-// helper func to generate JWT token
 const generateToken = (user) => {
   return jwt.sign(
     { id: user._id, role: user.role },
@@ -13,7 +12,6 @@ const generateToken = (user) => {
   );
 };
 
-//Register User
 router.post("/register", async (req, res) => {
   const { username, email, password, role, department } = req.body;
 
@@ -38,7 +36,6 @@ router.post("/register", async (req, res) => {
   }
 });
 
-//Login User
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -76,7 +73,6 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// route checker
 router.get("/check", async (req, res) => {
   try {
     const token = req.cookies.token;
