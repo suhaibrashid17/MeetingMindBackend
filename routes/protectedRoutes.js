@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const authMiddleware = require("../middleware/authMiddleware");
 
-//protected route — any logged-in user
 router.get("/profile", authMiddleware(), (req, res) => {
   res.json({
     message: "Welcome to your profile!",
@@ -10,7 +9,6 @@ router.get("/profile", authMiddleware(), (req, res) => {
   });
 });
 
-// admin-only route
 router.get("/admin", authMiddleware(["organization_admin"]), (req, res) => {
   res.json({
     message: "You are an organization admin!",
@@ -18,7 +16,6 @@ router.get("/admin", authMiddleware(["organization_admin"]), (req, res) => {
   });
 });
 
-//lgout route — clears the token cookie
 router.post("/logout", (req, res) => {
   res.clearCookie("token").json({ message: "Logged out successfully" });
 });
