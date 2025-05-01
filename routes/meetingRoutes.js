@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const {createMeeting, deleteMeeting, updateMeeting} = require('../controllers/meetingController');
+const {createMeeting, getAttendedMeetings, getOrganizedMeetings} = require('../controllers/meetingController');
 
 router.post('/meeting', createMeeting);
-router.delete('/meeting/:meetingId', deleteMeeting);
-router.put('/meeting/:meetingId', updateMeeting);
-
+router.get('/getattendedmeetings/:id', getAttendedMeetings);
+router.get('/getorganizedmeetings/:id', getOrganizedMeetings);
 module.exports=router;

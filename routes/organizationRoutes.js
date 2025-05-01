@@ -6,5 +6,4 @@ router.get('/organization/:id', getOrganizationById)
 router.delete('/organization/:orgId', deleteOrganization);
 router.put('/organization/:orgId', updateOrganization);
 router.get('/getdeptsbyorgid/:orgId', getDepartmentsByOrgId);
-
 module.exports = router;

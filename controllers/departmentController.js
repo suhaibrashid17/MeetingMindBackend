@@ -85,7 +85,11 @@ const getDepartmentById = async (req, res) => {
       })
       .populate({
         path: 'organization',
-        select: 'name _id'
+        select: 'name _id owner',
+        populate: {
+          path: 'owner',
+          select: '_id'
+        }
       })
       .select('name head employees organization'); 
 
@@ -107,7 +111,10 @@ const getDepartmentById = async (req, res) => {
         })),
         organization: {
           id: department.organization._id,
-          name: department.organization.name
+          name: department.organization.name,
+          owner: {
+            id: department.organization.owner._id
+          }
         }
       }
     };
@@ -118,7 +125,6 @@ const getDepartmentById = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
 const addEmployee = async (req, res) => {
     try {
         const deptId = req.params.id;
@@ -225,4 +231,118 @@ const assignHead = async (req, res) => {
     }
 };
 
-module.exports = {createDepartment, deleteDepartment, updateDepartment, getDepartmentById, addEmployee, assignHead}
+
+
+const removeEmployee = async (req, res) => {
+  try {
+    const { departmentId, employeeId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(departmentId) || !mongoose.Types.ObjectId.isValid(employeeId)) {
+      return res.status(400).json({ message: 'Invalid department or employee ID' });
+    }
+
+    const department = await Department.findById(departmentId).populate('organization');
+    if (!department) {
+      return res.status(404).json({ message: 'Department not found' });
+    }
+
+    const employee = await User.findById(employeeId);
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
+
+    if (!department.employees.includes(employeeId)) {
+      return res.status(400).json({ message: 'Employee is not in this department' });
+    }
+
+    department.employees = department.employees.filter(id => id.toString() !== employeeId);
+    await department.save();
+
+    const orgId = department.organization._id;
+    employee.employeeRoles = employee.employeeRoles
+      .map(role => {
+        if (role.organization.toString() === orgId.toString()) {
+          role.departments = role.departments.filter(depId => depId.toString() !== departmentId);
+        }
+        return role;
+      })
+      .filter(role => role.departments.length > 0 || role.organization.toString() !== orgId.toString());
+
+    await employee.save();
+
+    res.status(200).json({
+      message: 'Employee removed from department successfully',
+      department: {
+        id: department._id,
+        name: department.name,
+        employees: department.employees,
+      },
+    });
+  } catch (error) {
+    console.error('Error in removeEmployee:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+const removeHead = async (req, res) => {
+  try {
+    const { departmentId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(departmentId)) {
+      return res.status(400).json({ message: 'Invalid department ID' });
+    }
+
+    const department = await Department.findById(departmentId).populate('organization');
+    if (!department) {
+      return res.status(404).json({ message: 'Department not found' });
+    }
+
+    if (!department.head) {
+      return res.status(400).json({ message: 'No head assigned to this department' });
+    }
+
+    const head = await User.findById(department.head);
+    if (!head) {
+      return res.status(404).json({ message: 'Head user not found' });
+    }
+
+    head.headedDepartments = head.headedDepartments.filter(depId => depId.toString() !== departmentId);
+
+    if (!department.employees.includes(head._id)) {
+      department.employees.push(head._id);
+    }
+
+    const orgId = department.organization._id;
+    let orgRole = head.employeeRoles.find(role => role.organization.toString() === orgId.toString());
+    if (orgRole) {
+      if (!orgRole.departments.includes(departmentId)) {
+        orgRole.departments.push(departmentId);
+      }
+    } else {
+      head.employeeRoles.push({
+        organization: orgId,
+        departments: [departmentId],
+      });
+    }
+
+    department.head = null;
+
+    await Promise.all([department.save(), head.save()]);
+
+    res.status(200).json({
+      message: 'Head removed and added as employee successfully',
+      department: {
+        id: department._id,
+        name: department.name,
+        head: department.head,
+        employees: department.employees,
+      },
+    });
+  } catch (error) {
+    console.error('Error in removeHead:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+module.exports = {createDepartment, deleteDepartment, updateDepartment, getDepartmentById, addEmployee, assignHead, removeHead, removeEmployee}
