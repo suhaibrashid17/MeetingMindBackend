@@ -10,7 +10,7 @@ const generateToken = (user) => {
 };
 
 const Register = async (req, res) => {
-  const { username, email, password} = req.body;
+  let { username, email, password} = req.body;
 
   try {
     let existingUser = await User.findOne({ email });
@@ -19,13 +19,17 @@ const Register = async (req, res) => {
     existingUser = await User.findOne({ username });
     if (existingUser)
       return res.status(400).json({ message: "User with this username already exists" });
-
+    console.log({
+      "email":email,
+      "password":password,
+      "username":username,
+    })
     const salt=await bcrypt.genSalt(10);
-    const hashedPassword=await bcrypt.hash(password,salt);
+    password=await bcrypt.hash(password,salt);
     const user = new User({
       username,
       email,
-      hashedPassword,
+      password,
     });
 
     await user.save();

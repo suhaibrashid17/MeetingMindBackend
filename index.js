@@ -4,8 +4,9 @@ const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const authRoutes = require("./routes/authRoutes");
-const protectedRoutes = require("./routes/protectedRoutes");
-
+const organizationRoutes = require("./routes/organizationRoutes")
+const userRoutes = require("./routes/userRoutes")
+const deptRoutes = require("./routes/departmentRoutes")
 
 dotenv.config();
 
@@ -20,7 +21,9 @@ app.use(cors({
 }));
 
 app.use("/api/auth", authRoutes);
-app.use("/api/protected", protectedRoutes);
+app.use("/api", organizationRoutes);
+app.use("/api", userRoutes)
+app.use("/api", deptRoutes)
  mongoose.connect(process.env.MONGO_URI).then(()=>{
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT} and connected to db successfully`);
