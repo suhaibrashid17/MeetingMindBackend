@@ -117,4 +117,8 @@ const getDepartmentsByOrgId = async (req, res) => {
   }
 };
 
+
+
+
+
 module.exports = {createOrganization, deleteOrganization, updateOrganization, getOrganizationById, getDepartmentsByOrgId}

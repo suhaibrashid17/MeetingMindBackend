@@ -7,7 +7,7 @@ const authRoutes = require("./routes/authRoutes");
 const organizationRoutes = require("./routes/organizationRoutes")
 const userRoutes = require("./routes/userRoutes")
 const deptRoutes = require("./routes/departmentRoutes")
-
+const meetingRoutes = require("./routes/meetingRoutes")
 dotenv.config();
 
 const app = express();
@@ -24,6 +24,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api", organizationRoutes);
 app.use("/api", userRoutes)
 app.use("/api", deptRoutes)
+app.use("/api", meetingRoutes)
  mongoose.connect(process.env.MONGO_URI).then(()=>{
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT} and connected to db successfully`);

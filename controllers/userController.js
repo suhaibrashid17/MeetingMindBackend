@@ -18,9 +18,15 @@ const getHeadedDepartments = async (req, res) => {
 
     const departments = await Department.find({ head: userId }).populate('organization', 'name');
 
-    res.status(200).json(departments);
+    const organizations = [
+      ...new Map(
+        departments.map(dept => [dept.organization._id.toString(), dept.organization])
+      ).values()
+    ];
+
+    res.status(200).json(organizations);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching headed departments", error });
+    res.status(500).json({ message: "Error fetching organizations from headed departments", error });
   }
 };
 
@@ -31,19 +37,21 @@ const getEmployeeRoles = async (req, res) => {
     const user = await User.findById(userId).populate({
       path: 'employeeRoles.organization',
       select: 'name'
-    }).populate({
-      path: 'employeeRoles.departments',
-      select: 'name'
     });
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.status(200).json(user.employeeRoles);
+    const organizations = [
+      ...new Map(
+        user.employeeRoles.map(role => [role.organization._id.toString(), role.organization])
+      ).values()
+    ];
+
+    res.status(200).json(organizations);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching employee roles", error });
+    res.status(500).json({ message: "Error fetching organizations from employee roles", error });
   }
 };
-
 module.exports = {getEmployeeRoles, getHeadedDepartments, getOwnedOrganizations}
