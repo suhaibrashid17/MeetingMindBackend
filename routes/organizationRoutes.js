@@ -1,6 +1,6 @@
 import express from 'express'
 const router = express.Router();
-import {createOrganization, deleteOrganization, updateOrganization, getOrganizationById, getDepartmentsByOrgId} from '../controllers/organizationController'
+import {createOrganization, deleteOrganization, updateOrganization, getOrganizationById, getDepartmentsByOrgId} from '../controllers/organizationController.js'
 router.post('/organization', createOrganization);
 router.get('/organization/:id', getOrganizationById)
 router.delete('/organization/:orgId', deleteOrganization);
