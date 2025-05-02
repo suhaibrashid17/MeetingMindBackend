@@ -1,8 +1,8 @@
-const User = require('../models/User');
-const Organization = require('../models/Organization');
-const Department = require('../models/Department');
+import User from '../models/User.js';
+import Organization from '../models/Organization.js';
+import Department from '../models/Department.js';
 
-const getOwnedOrganizations = async (req, res) => {
+export const getOwnedOrganizations = async (req, res) => {
   try {
     const userId = req.query.userId;
     const organizations = await Organization.find({ owner: userId });
@@ -12,7 +12,7 @@ const getOwnedOrganizations = async (req, res) => {
   }
 };
 
-const getHeadedDepartments = async (req, res) => {
+export const getHeadedDepartments = async (req, res) => {
   try {
     const userId = req.query.userId;
 
@@ -30,7 +30,7 @@ const getHeadedDepartments = async (req, res) => {
   }
 };
 
-const getEmployeeRoles = async (req, res) => {
+export const getEmployeeRoles = async (req, res) => {
   try {
     const userId = req.query.userId;
 
@@ -54,4 +54,3 @@ const getEmployeeRoles = async (req, res) => {
     res.status(500).json({ message: "Error fetching organizations from employee roles", error });
   }
 };
-module.exports = {getEmployeeRoles, getHeadedDepartments, getOwnedOrganizations}

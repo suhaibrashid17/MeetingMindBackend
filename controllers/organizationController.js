@@ -1,11 +1,12 @@
-const User = require('../models/User');
-const Organization = require('../models/Organization');
-const mongoose = require('mongoose');
-const createOrganization = async (req, res) => {
+import User from '../models/User.js';
+import Organization from '../models/Organization.js';
+import mongoose from 'mongoose';
+
+export const createOrganization = async (req, res) => {
   try {
     const { name, ownerId } = req.body;
-    console.log(name)
-    console.log(ownerId)
+    console.log(name);
+    console.log(ownerId);
     const newOrg = new Organization({
       name,
       owner: ownerId,
@@ -18,13 +19,12 @@ const createOrganization = async (req, res) => {
 
     res.status(201).json(savedOrg);
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({ message: "Error creating organization", error });
   }
 };
 
-
-const deleteOrganization = async (req, res) => {
+export const deleteOrganization = async (req, res) => {
   try {
     const { orgId } = req.params;
     const deletedOrg = await Organization.findByIdAndDelete(orgId);
@@ -42,7 +42,7 @@ const deleteOrganization = async (req, res) => {
   }
 };
 
-const updateOrganization = async (req, res) => {
+export const updateOrganization = async (req, res) => {
   try {
     const { orgId } = req.params;
     const { name } = req.body;
@@ -62,10 +62,11 @@ const updateOrganization = async (req, res) => {
     res.status(500).json({ message: "Error updating organization", error });
   }
 };
-const getOrganizationById = async (req, res) => {
+
+export const getOrganizationById = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(id)
+    console.log(id);
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid organization ID' });
@@ -81,7 +82,7 @@ const getOrganizationById = async (req, res) => {
         populate: [
           {
             path: 'head',
-            select: 'username email' 
+            select: 'username email'
           },
           {
             path: 'employees',
@@ -99,14 +100,13 @@ const getOrganizationById = async (req, res) => {
       message: 'Organization retrieved successfully',
       data: organization
     });
-
   } catch (error) {
     console.error('Error fetching organization:', error);
     res.status(500).json({ message: 'Server error while fetching organization' });
   }
 };
 
-const getDepartmentsByOrgId = async (req, res) => {
+export const getDepartmentsByOrgId = async (req, res) => {
   try {
     const { orgId } = req.params;
     const departments = await Department.find({ organization: orgId }).select('name');
@@ -116,9 +116,3 @@ const getDepartmentsByOrgId = async (req, res) => {
     res.status(500).json({ message: 'Error fetching departments', error: error.message });
   }
 };
-
-
-
-
-
-module.exports = {createOrganization, deleteOrganization, updateOrganization, getOrganizationById, getDepartmentsByOrgId}

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose"
 
 const OrganizationSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -6,6 +6,5 @@ const OrganizationSchema = new mongoose.Schema({
     departments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Department' }],
     createdAt: { type: Date, default: Date.now },
   });
-
-  module.exports = mongoose.model("Organization", OrganizationSchema);
+export default mongoose.model("Organization", OrganizationSchema);
   

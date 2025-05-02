@@ -1,9 +1,9 @@
 
-const Department = require('../models/Department');
-const Organization = require('../models/Organization');
-const User = require('../models/User')
-const mongoose = require('mongoose')
-const createDepartment = async (req, res) => {
+import Department from '../models/Department.js';
+import Organization from '../models/Organization.js';
+import User from '../models/User.js';
+import mongoose from 'mongoose';
+export const createDepartment = async (req, res) => {
   try {
     const { name, organizationId } = req.body;
     console.log(name)
@@ -27,7 +27,7 @@ const createDepartment = async (req, res) => {
   }
 };
 
-const deleteDepartment = async (req, res) => {
+export const deleteDepartment = async (req, res) => {
   try {
     const { deptId } = req.params;
 
@@ -47,7 +47,7 @@ const deleteDepartment = async (req, res) => {
   }
 };
 
-const updateDepartment = async (req, res) => {
+export const updateDepartment = async (req, res) => {
   try {
     const { deptId } = req.params;
     const { name, headId } = req.body;
@@ -67,7 +67,7 @@ const updateDepartment = async (req, res) => {
     res.status(500).json({ message: "Error updating department", error });
   }
 };
-const getDepartmentById = async (req, res) => {
+export const getDepartmentById = async (req, res) => {
   try {
     const departmentId = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(departmentId)) {
@@ -125,7 +125,7 @@ const getDepartmentById = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-const addEmployee = async (req, res) => {
+export const addEmployee = async (req, res) => {
     try {
         const deptId = req.params.id;
         const { email } = req.body;
@@ -176,7 +176,7 @@ const addEmployee = async (req, res) => {
     }
 };
 
-const assignHead = async (req, res) => {
+export const assignHead = async (req, res) => {
     try {
         const  deptId  = req.params.id;
         const { email } = req.body;
@@ -233,7 +233,7 @@ const assignHead = async (req, res) => {
 
 
 
-const removeEmployee = async (req, res) => {
+export const removeEmployee = async (req, res) => {
   try {
     const { departmentId, employeeId } = req.params;
 
@@ -285,7 +285,7 @@ const removeEmployee = async (req, res) => {
 };
 
 
-const removeHead = async (req, res) => {
+export const removeHead = async (req, res) => {
   try {
     const { departmentId } = req.params;
 
@@ -345,4 +345,3 @@ const removeHead = async (req, res) => {
   }
 };
 
-module.exports = {createDepartment, deleteDepartment, updateDepartment, getDepartmentById, addEmployee, assignHead, removeHead, removeEmployee}

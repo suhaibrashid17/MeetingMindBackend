@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken");
+import jwt from "jsonwebtoken";
 
-const authMiddleware = (roles = []) => {
+export const authMiddleware = (roles = []) => {
   return (req, res, next) => {
     const token = req.cookies.token;
 
@@ -22,5 +22,3 @@ const authMiddleware = (roles = []) => {
     }
   };
 };
-
-module.exports = authMiddleware;

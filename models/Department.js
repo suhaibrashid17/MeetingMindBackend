@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-
+import mongoose from "mongoose"
 const DepartmentSchema = new mongoose.Schema({
     name: { type: String, required: true },
     organization: { type: mongoose.Schema.Types.ObjectId, ref: 'Organization', required: true },
@@ -8,4 +7,4 @@ const DepartmentSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
   });
 
-  module.exports = mongoose.model("Department", DepartmentSchema)
+export default mongoose.model("Department", DepartmentSchema)
