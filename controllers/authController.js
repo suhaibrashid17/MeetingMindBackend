@@ -9,7 +9,7 @@ export const generateToken = (user) => {
   );
 };
 
-const Register = async (req, res) => {
+export const Register = async (req, res) => {
   let { username, email, password} = req.body;
 
   try {

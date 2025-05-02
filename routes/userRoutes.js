@@ -1,6 +1,6 @@
 import express from 'express'
 const router = express.Router()
-import {getEmployeeRoles, getHeadedDepartments, getOwnedOrganizations} from "../controllers/userController"
+import {getEmployeeRoles, getHeadedDepartments, getOwnedOrganizations} from "../controllers/userController.js"
 router.get('/getownedorganizations', getOwnedOrganizations);
 router.get('/getheadeddepartments', getHeadedDepartments);
 router.get('/getemployeeroles', getEmployeeRoles);
