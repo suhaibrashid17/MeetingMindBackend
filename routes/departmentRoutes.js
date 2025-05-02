@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import { createDepartment, deleteDepartment, updateDepartment, getDepartmentById, addEmployee, assignHead, removeEmployee, removeHead } from '../controllers/departmentController.js';
+
 const router = express.Router();
-const {createDepartment, deleteDepartment, updateDepartment, getDepartmentById, addEmployee, assignHead, removeEmployee, removeHead} = require('../controllers/departmentController');
 
 router.post('/department', createDepartment);
 router.get('/department/:id', getDepartmentById);
@@ -10,4 +11,5 @@ router.post('/addemployee/:id', addEmployee);
 router.post('/assignadmin/:id', assignHead);
 router.delete('/departments/:departmentId/employees/:employeeId', removeEmployee);
 router.delete('/removehead/:departmentId', removeHead);
-module.exports = router;
+
+export default router;

@@ -1,12 +1,12 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const Meeting = require('../models/Meeting');
-const User = require('../models/User');
+import express from 'express';
+import mongoose from 'mongoose';
+import Meeting from '../models/Meeting.js';
+import User from '../models/User.js';
 
-const createMeeting =  async (req, res) => {
+export const createMeeting = async (req, res) => {
   try {
     const { attendees, date, description, duration, title, venue, organizerId } = req.body;
-    console.log(req.body)
+    console.log(req.body);
     if (!title || !date) {
       return res.status(400).json({ error: 'Title and date are required' });
     }
@@ -65,7 +65,7 @@ const createMeeting =  async (req, res) => {
   }
 };
 
-const getAttendedMeetings = async (req, res) => {
+export const getAttendedMeetings = async (req, res) => {
   try {
     const userId = req.params.id;
 
@@ -76,11 +76,11 @@ const getAttendedMeetings = async (req, res) => {
     const meetings = await Meeting.find({
       attendees: userId,
       organizer: { $ne: userId },
-      status: 'scheduled', 
+      status: 'scheduled',
     })
       .populate('organizer', '_id username email')
       .populate('attendees', '_id username email')
-      .sort({ date: 1 }) 
+      .sort({ date: 1 })
       .lean();
 
     res.status(200).json({
@@ -93,21 +93,21 @@ const getAttendedMeetings = async (req, res) => {
   }
 };
 
-const getOrganizedMeetings = async (req, res) => {
+export const getOrganizedMeetings = async (req, res) => {
   try {
     const userId = req.params.id;
-    console.log(req.params)
+    console.log(req.params);
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       return res.status(400).json({ error: 'Invalid user ID' });
     }
 
     const meetings = await Meeting.find({
       organizer: userId,
-      status: 'scheduled', 
+      status: 'scheduled',
     })
       .populate('organizer', '_id username email')
       .populate('attendees', '_id username email')
-      .sort({ date: 1 }) 
+      .sort({ date: 1 })
       .lean();
 
     res.status(200).json({
@@ -119,5 +119,3 @@ const getOrganizedMeetings = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
-
-module.exports = {createMeeting, getAttendedMeetings, getOrganizedMeetings};

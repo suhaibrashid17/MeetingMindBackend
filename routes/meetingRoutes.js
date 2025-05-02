@@ -1,8 +1,10 @@
-const express = require('express');
+import express from 'express';
+import { createMeeting, getAttendedMeetings, getOrganizedMeetings } from '../controllers/meetingController.js';
+
 const router = express.Router();
-const {createMeeting, getAttendedMeetings, getOrganizedMeetings} = require('../controllers/meetingController');
 
 router.post('/meeting', createMeeting);
 router.get('/getattendedmeetings/:id', getAttendedMeetings);
 router.get('/getorganizedmeetings/:id', getOrganizedMeetings);
-module.exports=router;
+
+export default router;

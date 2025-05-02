@@ -1,13 +1,14 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cookieParser = require("cookie-parser");
-const cors = require("cors");
-const dotenv = require("dotenv");
-const authRoutes = require("./routes/authRoutes");
-const organizationRoutes = require("./routes/organizationRoutes")
-const userRoutes = require("./routes/userRoutes")
-const deptRoutes = require("./routes/departmentRoutes")
-const meetingRoutes = require("./routes/meetingRoutes")
+import express from "express";
+import mongoose from "mongoose";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import dotenv from "dotenv";
+import authRoutes from "./routes/authRoutes.js";
+import organizationRoutes from "./routes/organizationRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import deptRoutes from "./routes/departmentRoutes.js";
+import meetingRoutes from "./routes/meetingRoutes.js";
+
 dotenv.config();
 
 const app = express();
@@ -19,15 +20,14 @@ app.use(cors());
 
 app.use("/api/auth", authRoutes);
 app.use("/api", organizationRoutes);
-app.use("/api", userRoutes)
-app.use("/api", deptRoutes)
-app.use("/api", meetingRoutes)
- mongoose.connect(process.env.MONGO_URI).then(()=>{
+app.use("/api", userRoutes);
+app.use("/api", deptRoutes);
+app.use("/api", meetingRoutes);
+
+mongoose.connect(process.env.MONGO_URI).then(() => {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT} and connected to db successfully`);
   });
- }).catch((error)=>{
-      console.log(error);
- });
-
-module.exports = app
+}).catch((error) => {
+  console.log(error);
+});

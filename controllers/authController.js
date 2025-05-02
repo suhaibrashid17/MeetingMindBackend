@@ -1,7 +1,7 @@
-const User = require("../models/User");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const generateToken = (user) => {
+import User from "../models/User.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+export const generateToken = (user) => {
   return jwt.sign(
     { id: user._id, role: user.role },
     process.env.JWT_SECRET,
@@ -41,7 +41,7 @@ const Register = async (req, res) => {
 }
 
 
-const Login = async (req, res) => {
+export const Login = async (req, res) => {
     const { email, password } = req.body;
   
     try {
@@ -79,7 +79,7 @@ const Login = async (req, res) => {
   };
 
 
-  const Check = async (req, res) => {
+ export const Check = async (req, res) => {
     try {
       const token = req.cookies.token;
       if (!token) return res.status(401).json({ message: "No token provided" });
@@ -95,8 +95,7 @@ const Login = async (req, res) => {
     }
   }
 
-const Logout = async(req, res) => {
+export const Logout = async(req, res) => {
     res.clearCookie("token").json({ message: "Logged out successfully" });
   }
 
-  module.exports = {Login, Register, Check, Logout}

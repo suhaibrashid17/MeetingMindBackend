@@ -1,8 +1,8 @@
-const express = require('express')
+import express from 'express'
 const router = express.Router()
-const {getEmployeeRoles, getHeadedDepartments, getOwnedOrganizations} = require('../controllers/userController')
+import {getEmployeeRoles, getHeadedDepartments, getOwnedOrganizations} from "../controllers/userController"
 router.get('/getownedorganizations', getOwnedOrganizations);
 router.get('/getheadeddepartments', getHeadedDepartments);
 router.get('/getemployeeroles', getEmployeeRoles);
 
-module.exports = router;
+export default router;
