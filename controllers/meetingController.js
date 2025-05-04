@@ -77,7 +77,7 @@ export const getAttendedMeetings = async (req, res) => {
     const meetings = await Meeting.find({
       attendees: userId,
       organizer: { $ne: userId },
-      status: 'scheduled',
+      status: { $in: ['scheduled', 'in progress','done'] },
     })
       .populate('organizer', '_id username email')
       .populate('attendees', '_id username email')
@@ -104,7 +104,7 @@ export const getOrganizedMeetings = async (req, res) => {
 
     const meetings = await Meeting.find({
       organizer: userId,
-      status: 'scheduled',
+      status: { $in: ['scheduled', 'in progress', 'done'] },
     })
       .populate('organizer', '_id username email')
       .populate('attendees', '_id username email')
@@ -161,6 +161,7 @@ export const GetMeeting = async (req, res) => {
       status: meeting.status,
       location: meeting.location,
       createdAt: meeting.createdAt,
+      transcription: meeting.transcription || '',
       organizer: meeting.organizer
         ? {
             _id: meeting.organizer._id,
@@ -223,5 +224,131 @@ export const TranscribeAudio = async (req, res) => {
       fs.unlinkSync(req.file.path);
     }
     res.status(500).json({ error: 'Failed to transcribe audio' });
+  }
+};
+
+export const ChangeStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid meeting ID' });
+    }
+
+    const validStatuses = ['scheduled', 'in progress', 'done'];
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({ 
+        error: 'Invalid status. Must be one of: scheduled, in progress, done' 
+      });
+    }
+    const meeting = await Meeting.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true, runValidators: true }
+    );
+    if (!meeting) {
+      return res.status(404).json({ error: 'Meeting not found' });
+    }
+
+    res.status(200).json({
+      message: 'Meeting status updated successfully',
+      meeting
+    });
+
+  } catch (error) {
+    console.error('Error updating meeting status:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const SaveTranscription = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { transcription } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid meeting ID' });
+    }
+
+    if (!transcription || typeof transcription !== 'string') {
+      return res.status(400).json({ error: 'Transcription is required and must be a string' });
+    }
+
+    const meeting = await Meeting.findByIdAndUpdate(
+      id,
+      { transcription },
+      { new: true, runValidators: true }
+    );
+
+    if (!meeting) {
+      return res.status(404).json({ error: 'Meeting not found' });
+    }
+
+    res.status(200).json({
+      message: 'Transcription saved successfully',
+      meeting
+    });
+  } catch (error) {
+    console.error('Error saving transcription:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+export const AnalyzeTranscription = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { transcription } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: 'Invalid meeting ID' });
+    }
+
+    if (!transcription || typeof transcription !== 'string') {
+      return res.status(400).json({ error: 'Transcription is required and must be a string' });
+    }
+
+    const meeting = await Meeting.findById(id);
+    if (!meeting) {
+      return res.status(404).json({ error: 'Meeting not found' });
+    }
+
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+    const systemPrompt = `
+      You are an AI meeting assistant tasked with monitoring a meeting's transcription to ensure it adheres to the meeting agenda and maintains proper decorum. The meeting is conducted in Urdu, and all Urdu text is valid, professional, and expected. The meeting agenda is: "${meeting.description}".
+      
+      Your role:
+      1. Analyze the provided transcription snippet to check if the discussion aligns with the agenda. Allow normal chit-chat, greetings, or brief off-topic remarks in Urdu, but flag significant deviations from the agenda.
+      2. Check for violations of meeting decorum, such as abusive, toxic, or inappropriate language in Urdu. Do not flag Urdu text as unprofessional or inappropriate based on the language itself.
+      3. If the discussion is on track and decorum is maintained, return "<Keep Going>".
+      4. If there is a violation, return a message indicating the type of violation (agenda or decorum) and a brief explanation. For example:
+         - Agenda violation: "The discussion is veering off-topic. Please return to the agenda: ${meeting.description}."
+         - Decorum violation: "Inappropriate or abusive language detected. Please maintain professional decorum."
+
+      Be concise, clear, and language-agnostic in your responses, focusing only on content and behavior, not the use of Urdu.
+    `;
+
+    const chatCompletion = await groq.chat.completions.create({
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `Transcription: ${transcription}` }
+      ],
+      model: 'meta-llama/llama-4-maverick-17b-128e-instruct',
+      temperature: 0.7,
+      max_completion_tokens: 256,
+      top_p: 1,
+      stream: false
+    });
+
+    const responseText = chatCompletion.choices[0].message.content;
+
+    res.status(200).json({
+      message: 'Transcription analyzed successfully',
+      result: responseText
+    });
+  } catch (error) {
+    console.error('Error analyzing transcription:', error);
+    res.status(500).json({ error: 'Failed to analyze transcription' });
   }
 };

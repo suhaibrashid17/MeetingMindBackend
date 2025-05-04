@@ -1,5 +1,5 @@
 import express from 'express';
-import { createMeeting, getAttendedMeetings, GetMeeting, getOrganizedMeetings, TranscribeAudio } from '../controllers/meetingController.js';
+import { ChangeStatus, createMeeting, getAttendedMeetings, GetMeeting, getOrganizedMeetings, TranscribeAudio, SaveTranscription, AnalyzeTranscription } from '../controllers/meetingController.js';
 import upload from '../middleware/multerConfig.js';
 
 const router = express.Router();
@@ -9,5 +9,8 @@ router.get('/getattendedmeetings/:id', getAttendedMeetings);
 router.get('/getorganizedmeetings/:id', getOrganizedMeetings);
 router.get('/meeting/:id', GetMeeting);
 router.post('/transcribe', upload.single('file'), TranscribeAudio);
+router.patch('/meeting/:id/status', ChangeStatus);
+router.post('/meeting/:id/transcription', SaveTranscription);
+router.post('/meeting/:id/analyze', AnalyzeTranscription);
 
 export default router;

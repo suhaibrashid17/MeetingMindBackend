@@ -1,6 +1,5 @@
 import mongoose from "mongoose"
 
-
 const MeetingSchema = new mongoose.Schema({
     title: { type: String, required: true },
     description: { type: String },
@@ -12,12 +11,12 @@ const MeetingSchema = new mongoose.Schema({
     department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' }, 
     status: {
       type: String,
-      enum: ['scheduled', 'completed', 'canceled'],
+      enum: ['scheduled', 'in progress', 'done'],
       default: 'scheduled',
     },
     location: { type: String },
     createdAt: { type: Date, default: Date.now },
-  });
-
+    transcription: { type: String, default: '' }
+});
 
 export default mongoose.model("Meeting", MeetingSchema)
