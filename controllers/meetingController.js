@@ -352,3 +352,24 @@ export const AnalyzeTranscription = async (req, res) => {
     res.status(500).json({ error: 'Failed to analyze transcription' });
   }
 };
+
+export const deleteMeeting = async (req, res) => {
+  try {
+    console.log("im here")
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid meeting ID' });
+    }
+
+    const meeting = await Meeting.findByIdAndDelete(id);
+
+    if (!meeting) {
+      return res.status(404).json({ message: 'Meeting not found' });
+    }
+
+    res.status(200).json({ message: 'Meeting deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting meeting:', error);
+    res.status(500).json({ message: 'Server error while deleting meeting' });
+  }
+};
